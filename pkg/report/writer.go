@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/aquasecurity/trivy/pkg/report/asff"
 	"golang.org/x/xerrors"
 
 	dbTypes "github.com/aquasecurity/trivy-db/pkg/types"
@@ -22,6 +23,7 @@ const (
 	FormatJSON      = "json"
 	FormatTemplate  = "template"
 	FormatSarif     = "sarif"
+	FormatAsff      = "asff"
 	FormatCycloneDX = "cyclonedx"
 	FormatSPDX      = "spdx"
 	FormatSPDXJSON  = "spdx-json"
@@ -68,12 +70,19 @@ func Write(report types.Report, option Option) error {
 			writer = SarifWriter{Output: option.Output, Version: option.AppVersion}
 			break
 		}
+		//if strings.HasPrefix(option.OutputTemplate, "@") && strings.HasSuffix(option.OutputTemplate, "asff.tpl") {
+		//	log.Logger.Warn("Using `--template asff.tpl` is deprecated. Please migrate to `--format asff`.")
+		//	writer = asff.ASFFWriter{Output: option.Output}
+		//	break
+		//}
 		var err error
 		if writer, err = NewTemplateWriter(option.Output, option.OutputTemplate); err != nil {
 			return xerrors.Errorf("failed to initialize template writer: %w", err)
 		}
 	case FormatSarif:
 		writer = SarifWriter{Output: option.Output, Version: option.AppVersion}
+	case FormatAsff:
+		writer = asff.ASFFWriter{Output: option.Output}
 	default:
 		return xerrors.Errorf("unknown format: %v", option.Format)
 	}
