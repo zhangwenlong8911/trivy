@@ -19,7 +19,8 @@ type ASFFWriter struct {
 	Output io.Writer
 }
 
-type vulnPart struct {
+type result struct {
+	fileName        string
 	Vulnerabilities *[]types.DetectedVulnerability
 }
 
@@ -29,20 +30,21 @@ func (aw ASFFWriter) Write(report types.Report) error {
 	parts := len(report.Results[0].Vulnerabilities) / vulnLimit // number of files by vulnerability limit
 	file := aw.Output.(*os.File)
 	outputs := make(map[io.Writer][]byte)
-
-	//for i, vuln := range report.Results[0].Vulnerabilities {
-	//
-	//}
+	var results []result
 
 	if aw.Output == os.Stdout || parts == 0 {
-		output, err := createFormattedOutput(target, report.Results[0].Vulnerabilities)
+		r := result{fileName: file.Name(), Vulnerabilities: &report.Results[0].Vulnerabilities}
+		results = append(results, r)
+
+		/*output, err := createFormattedOutput(target, report.Results[0].Vulnerabilities)
 		if err != nil {
 			return xerrors.Errorf("failed to create output: %w", err)
 		}
-		outputs[aw.Output] = output
+		outputs[aw.Output] = output*/
 	} else {
 		for i := 0; i < parts; i++ {
-			output, err := createFormattedOutput(report.Results[0].Target, report.Results[0].Vulnerabilities[i*100:i*100+100])
+			/*r := result{fileName: }*/
+			output, err := createFormattedOutput(target, report.Results[0].Vulnerabilities[i*100:i*100+100])
 			if err != nil {
 				return xerrors.Errorf("failed to create output: %w", err)
 			}
