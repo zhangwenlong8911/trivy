@@ -12,58 +12,53 @@ import (
 	"golang.org/x/xerrors"
 )
 
-const vulnLimit = 100
+const (
+	vulnLimit          = 100 // AWS SecurityHub only accepts reports with 100 or fewer findings.
+	fileNamePartFormat = "part%d_%s"
+)
 
 // ASFFWriter implements result Writer
 type ASFFWriter struct {
 	Output io.Writer
 }
 
-type result struct {
-	fileName        string
-	Vulnerabilities *[]types.DetectedVulnerability
-}
-
-// Write writes the results in JSON format
+// Write writes the results in ASFF format
 func (aw ASFFWriter) Write(report types.Report) error {
 	target := report.Results[0].Target
 	parts := len(report.Results[0].Vulnerabilities) / vulnLimit // number of files by vulnerability limit
 	file := aw.Output.(*os.File)
-	outputs := make(map[io.Writer][]byte)
-	var results []result
+	outputs := make(map[io.Writer][]types.DetectedVulnerability)
 
 	if aw.Output == os.Stdout || parts == 0 {
-		r := result{fileName: file.Name(), Vulnerabilities: &report.Results[0].Vulnerabilities}
-		results = append(results, r)
-
-		/*output, err := createFormattedOutput(target, report.Results[0].Vulnerabilities)
-		if err != nil {
-			return xerrors.Errorf("failed to create output: %w", err)
-		}
-		outputs[aw.Output] = output*/
+		outputs[aw.Output] = report.Results[0].Vulnerabilities
 	} else {
+		fileName := filepath.Base(file.Name())
+		dir := filepath.Dir(file.Name())
+		// remove base file(created earlier) to create multiple files
+		os.Remove(filepath.Join(dir, fileName))
+		// split report into multiple files
 		for i := 0; i < parts; i++ {
-			/*r := result{fileName: }*/
-			output, err := createFormattedOutput(target, report.Results[0].Vulnerabilities[i*100:i*100+100])
+			writer, err := os.Create(filepath.Join(dir, fmt.Sprintf(fileNamePartFormat, i, fileName)))
 			if err != nil {
 				return xerrors.Errorf("failed to create output: %w", err)
 			}
-			dir := filepath.Dir(file.Name())
-			fileName := fmt.Sprintf("part%d_%s", i, filepath.Base(file.Name()))
-			writer, err := os.Create(filepath.Join(dir, fileName))
-			outputs[writer] = output
+			outputs[writer] = report.Results[0].Vulnerabilities[i*vulnLimit : i*vulnLimit+vulnLimit]
 		}
-		output, err := createFormattedOutput(report.Results[0].Target, report.Results[0].Vulnerabilities[parts*100:])
-		if err != nil {
-			return xerrors.Errorf("failed to create output: %w", err)
+		vulns := report.Results[0].Vulnerabilities[parts*vulnLimit:]
+		if len(vulns) > 0 {
+			writer, err := os.Create(filepath.Join(dir, fmt.Sprintf(fileNamePartFormat, parts, fileName)))
+			if err != nil {
+				return xerrors.Errorf("failed to create output: %w", err)
+			}
+			outputs[writer] = vulns
 		}
-		dir := filepath.Dir(file.Name())
-		fileName := fmt.Sprintf("part%d_%s", parts, filepath.Base(file.Name()))
-		writer, err := os.Create(filepath.Join(dir, fileName))
-		outputs[writer] = output
 	}
-	for writer, output := range outputs {
-		if _, err := fmt.Fprintln(writer, string(output)); err != nil {
+	for writer, vulns := range outputs {
+		out, err := createFormattedOutput(target, vulns)
+		if err != nil {
+			return xerrors.Errorf("failed to format output: %w", err)
+		}
+		if _, err := fmt.Fprintln(writer, string(out)); err != nil {
 			return xerrors.Errorf("failed to write json: %w", err)
 		}
 	}
@@ -76,11 +71,11 @@ func createFormattedOutput(target string, vulns []types.DetectedVulnerability) (
 	for _, vuln := range vulns {
 		description := vuln.Description
 		if len(description) > 512 {
-			description = description[:512]
+			description = fmt.Sprintf("%s ..", description[:512])
 		}
 		image := target
 		if l := len(image); l > 127 {
-			image = image[l-124:]
+			image = fmt.Sprintf("...%s", image[l-124:])
 		}
 		severity := vuln.Severity
 		if severity == "UNKNOWN" {
@@ -131,7 +126,7 @@ func createFormattedOutput(target string, vulns []types.DetectedVulnerability) (
 		}
 		asff.Findings = append(asff.Findings, finding)
 	}
-	output, err := json.MarshalIndent(asff, "", "  ")
+	output, err := json.MarshalIndent(asff, "", "    ")
 	if err != nil {
 		return nil, xerrors.Errorf("failed to marshal json: %w", err)
 	}

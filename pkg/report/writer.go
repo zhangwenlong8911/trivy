@@ -70,11 +70,11 @@ func Write(report types.Report, option Option) error {
 			writer = SarifWriter{Output: option.Output, Version: option.AppVersion}
 			break
 		}
-		//if strings.HasPrefix(option.OutputTemplate, "@") && strings.HasSuffix(option.OutputTemplate, "asff.tpl") {
-		//	log.Logger.Warn("Using `--template asff.tpl` is deprecated. Please migrate to `--format asff`.")
-		//	writer = asff.ASFFWriter{Output: option.Output}
-		//	break
-		//}
+		if strings.HasPrefix(option.OutputTemplate, "@") && strings.HasSuffix(option.OutputTemplate, "asff.tpl") {
+			log.Logger.Warn("Using `--template asff.tpl` is deprecated. Please migrate to `--format asff`.")
+			writer = asff.ASFFWriter{Output: option.Output}
+			break
+		}
 		var err error
 		if writer, err = NewTemplateWriter(option.Output, option.OutputTemplate); err != nil {
 			return xerrors.Errorf("failed to initialize template writer: %w", err)

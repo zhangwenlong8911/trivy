@@ -6,7 +6,9 @@
             "ProductArn": "arn:aws:securityhub:test-region::product/aquasecurity/aquasecurity",
             "GeneratorId": "Trivy/CVE-2019-1549",
             "AwsAccountId": "123456789012",
-            "Types": [ "Software and Configuration Checks/Vulnerabilities/CVE" ],
+            "Types": [
+                "Software and Configuration Checks/Vulnerabilities/CVE"
+            ],
             "CreatedAt": "2020-08-10T07:28:17.000958601Z",
             "UpdatedAt": "2020-08-10T07:28:17.000958601Z",
             "Severity": {
@@ -20,7 +22,9 @@
                     "Url": "https://avd.aquasec.com/nvd/cve-2019-1549"
                 }
             },
-            "ProductFields": { "Product Name": "Trivy" },
+            "ProductFields": {
+                "Product Name": "Trivy"
+            },
             "Resources": [
                 {
                     "Type": "Container",
@@ -51,7 +55,9 @@
             "ProductArn": "arn:aws:securityhub:test-region::product/aquasecurity/aquasecurity",
             "GeneratorId": "Trivy/CVE-2019-1551",
             "AwsAccountId": "123456789012",
-            "Types": [ "Software and Configuration Checks/Vulnerabilities/CVE" ],
+            "Types": [
+                "Software and Configuration Checks/Vulnerabilities/CVE"
+            ],
             "CreatedAt": "2020-08-10T07:28:17.000958601Z",
             "UpdatedAt": "2020-08-10T07:28:17.000958601Z",
             "Severity": {
@@ -65,7 +71,9 @@
                     "Url": "https://avd.aquasec.com/nvd/cve-2019-1551"
                 }
             },
-            "ProductFields": { "Product Name": "Trivy" },
+            "ProductFields": {
+                "Product Name": "Trivy"
+            },
             "Resources": [
                 {
                     "Type": "Container",
@@ -96,7 +104,9 @@
             "ProductArn": "arn:aws:securityhub:test-region::product/aquasecurity/aquasecurity",
             "GeneratorId": "Trivy/CVE-2019-1549",
             "AwsAccountId": "123456789012",
-            "Types": [ "Software and Configuration Checks/Vulnerabilities/CVE" ],
+            "Types": [
+                "Software and Configuration Checks/Vulnerabilities/CVE"
+            ],
             "CreatedAt": "2020-08-10T07:28:17.000958601Z",
             "UpdatedAt": "2020-08-10T07:28:17.000958601Z",
             "Severity": {
@@ -110,7 +120,9 @@
                     "Url": "https://avd.aquasec.com/nvd/cve-2019-1549"
                 }
             },
-            "ProductFields": { "Product Name": "Trivy" },
+            "ProductFields": {
+                "Product Name": "Trivy"
+            },
             "Resources": [
                 {
                     "Type": "Container",
@@ -141,7 +153,9 @@
             "ProductArn": "arn:aws:securityhub:test-region::product/aquasecurity/aquasecurity",
             "GeneratorId": "Trivy/CVE-2019-1551",
             "AwsAccountId": "123456789012",
-            "Types": [ "Software and Configuration Checks/Vulnerabilities/CVE" ],
+            "Types": [
+                "Software and Configuration Checks/Vulnerabilities/CVE"
+            ],
             "CreatedAt": "2020-08-10T07:28:17.000958601Z",
             "UpdatedAt": "2020-08-10T07:28:17.000958601Z",
             "Severity": {
@@ -155,7 +169,9 @@
                     "Url": "https://avd.aquasec.com/nvd/cve-2019-1551"
                 }
             },
-            "ProductFields": { "Product Name": "Trivy" },
+            "ProductFields": {
+                "Product Name": "Trivy"
+            },
             "Resources": [
                 {
                     "Type": "Container",
