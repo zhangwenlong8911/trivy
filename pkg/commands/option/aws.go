@@ -6,16 +6,18 @@ import (
 
 // AWSOption holds the options for AWS scanning
 type AWSOption struct {
-	Region   string
-	Endpoint string
-	Services []string
+	Region      string
+	Endpoint    string
+	Services    []string
+	UpdateCache bool
 }
 
 // NewAWSOption is the factory method to return AWS options
 func NewAWSOption(c *cli.Context) AWSOption {
 	return AWSOption{
-		Region:   c.String("region"),
-		Endpoint: c.String("endpoint"),
-		Services: c.StringSlice("service"),
+		Region:      c.String("region"),
+		Endpoint:    c.String("endpoint"),
+		Services:    c.StringSlice("service"),
+		UpdateCache: c.Bool("update-cache"),
 	}
 }

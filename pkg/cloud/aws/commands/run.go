@@ -86,15 +86,32 @@ func run(ctx context.Context, opt cmd.Option) error {
 		allServices = awsScanner.AllSupportedServices()
 	} else {
 		log.Logger.Debugf("Specific services were requested: [%s]...", strings.Join(allServices, ", "))
+		for _, service := range allServices {
+			var found bool
+			supported := awsScanner.AllSupportedServices()
+			for _, allowed := range supported {
+				if allowed == service {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return fmt.Errorf("service '%s' is not currently supported - supported services are: %s", service, strings.Join(supported, ", "))
+			}
+		}
 	}
 
-	log.Logger.Debugf("Attempting to load results from cache...")
-	cached, err := report.LoadReport(accountID, allServices)
-	if err != nil {
-		if err != report.ErrCacheNotFound {
-			return err
+	var cached *report.Report
+
+	if !opt.UpdateCache {
+		log.Logger.Debugf("Attempting to load results from cache...")
+		cached, err = report.LoadReport(accountID, allServices)
+		if err != nil {
+			if err != report.ErrCacheNotFound {
+				return err
+			}
+			log.Logger.Debug("Cached results not found.")
 		}
-		log.Logger.Debug("Cached results not found.")
 	}
 
 	var remaining []string
@@ -119,7 +136,7 @@ func run(ctx context.Context, opt cmd.Option) error {
 
 	// if there is anything we need that wasn't in the cache, scan it now
 	if len(remaining) > 0 {
-		log.Logger.Debugf("Scanning non-cached services: [%s]...", strings.Join(remaining, ", "))
+		log.Logger.Debugf("Scanning the following services using the AWS API: [%s]...", strings.Join(remaining, ", "))
 		opt.Services = remaining
 		results, err := scanner.NewScanner().Scan(ctx, opt)
 		if err != nil {
@@ -127,17 +144,21 @@ func run(ctx context.Context, opt cmd.Option) error {
 		}
 		r = report.New(accountID, results, allServices)
 	} else {
+		log.Logger.Debug("No more services to scan - everything was found in the cache.")
 		r = report.New(accountID, nil, allServices)
 	}
 	if cached != nil {
+		log.Logger.Debug("Merging cached results...")
 		r.Merge(cached, true)
 		reportOptions.FromCache = true
 	}
 
+	log.Logger.Debug("Writing results to cache...")
 	if err := r.Save(); err != nil {
 		return err
 	}
 
+	log.Logger.Debug("Writing report to output...")
 	if err := report.Write(r, reportOptions); err != nil {
 		return xerrors.Errorf("unable to write results: %w", err)
 	}

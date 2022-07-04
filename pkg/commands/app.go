@@ -396,6 +396,11 @@ var (
 		EnvVars: []string{"TRIVY_AWS_SERVICE"},
 	}
 
+	cloudUpdateCacheFlag = cli.BoolFlag{
+		Name:  "update-cache",
+		Usage: "Update the local cache by running a scan against the target cloud service. The local cache will not be used for this scan.",
+	}
+
 	// Global flags
 	globalFlags = []cli.Flag{
 		&quietFlag,
@@ -1007,6 +1012,7 @@ func NewAWSCommand() *cli.Command {
 		Flags: []cli.Flag{
 			&awsServiceFlag,
 			&awsEndpointFlag,
+			&cloudUpdateCacheFlag,
 			&awsRegionFlag,
 			&templateFlag,
 			&formatFlag,

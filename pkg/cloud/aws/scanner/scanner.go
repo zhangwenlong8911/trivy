@@ -28,6 +28,10 @@ func (s *AWSScanner) Scan(ctx context.Context, option cmd.Option) (scan.Results,
 		scannerOpts = append(scannerOpts, scanner.ScannerWithProgressTracker(tracker))
 	}
 
+	if len(option.Services) > 0 {
+		scannerOpts = append(scannerOpts, scanner.ScannerWithAWSServices(option.Services...))
+	}
+
 	defsecResults, err := scanner.New(scannerOpts...).Scan(ctx)
 	if err != nil {
 		return nil, err
