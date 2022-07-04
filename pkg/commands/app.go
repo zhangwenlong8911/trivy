@@ -396,6 +396,12 @@ var (
 		EnvVars: []string{"TRIVY_AWS_SERVICE"},
 	}
 
+	awsARNFlag = cli.StringFlag{
+		Name:    "arn",
+		Usage:   "Only show results for the AWS Resource with the given ARN.",
+		EnvVars: []string{"TRIVY_AWS_ARN"},
+	}
+
 	cloudUpdateCacheFlag = cli.BoolFlag{
 		Name:  "update-cache",
 		Usage: "Update the local cache by running a scan against the target cloud service. The local cache will not be used for this scan.",
@@ -1010,6 +1016,7 @@ func NewAWSCommand() *cli.Command {
 `,
 		Action: awscommands.Run,
 		Flags: []cli.Flag{
+			&awsARNFlag,
 			&awsServiceFlag,
 			&awsEndpointFlag,
 			&cloudUpdateCacheFlag,

@@ -68,12 +68,6 @@ func run(ctx context.Context, opt cmd.Option) error {
 		}
 	}()
 
-	reportOptions := report.Option{
-		Format:     opt.Format,
-		Output:     opt.Output,
-		Severities: opt.Severities,
-	}
-
 	accountID, err := getAccountID(ctx)
 	if err != nil {
 		return err
@@ -134,6 +128,21 @@ func run(ctx context.Context, opt cmd.Option) error {
 
 	var r *report.Report
 
+	reportOptions := report.Option{
+		Format:      opt.Format,
+		Output:      opt.Output,
+		Severities:  opt.Severities,
+		ReportLevel: report.LevelService,
+	}
+	if len(opt.Services) == 1 {
+		reportOptions.ReportLevel = report.LevelResource
+		reportOptions.Service = opt.Services[0]
+	}
+	if opt.ARN != "" {
+		reportOptions.ReportLevel = report.LevelResult
+		reportOptions.ARN = opt.ARN
+	}
+
 	// if there is anything we need that wasn't in the cache, scan it now
 	if len(remaining) > 0 {
 		log.Logger.Debugf("Scanning the following services using the AWS API: [%s]...", strings.Join(remaining, ", "))
@@ -153,9 +162,11 @@ func run(ctx context.Context, opt cmd.Option) error {
 		reportOptions.FromCache = true
 	}
 
-	log.Logger.Debug("Writing results to cache...")
-	if err := r.Save(); err != nil {
-		return err
+	if len(remaining) > 0 { // don't write cache if we didn't scan anything new
+		log.Logger.Debug("Writing results to cache...")
+		if err := r.Save(); err != nil {
+			return err
+		}
 	}
 
 	log.Logger.Debug("Writing report to output...")

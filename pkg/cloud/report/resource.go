@@ -2,37 +2,48 @@ package report
 
 import (
 	"fmt"
-	"io"
 	"strconv"
+
+	"golang.org/x/term"
 
 	"github.com/aquasecurity/table"
 	pkgReport "github.com/aquasecurity/trivy/pkg/report"
 )
 
-func writeSummaryTable(w io.Writer, report *Report, fromCache bool) error {
+func writeResourceTable(report *Report, option Option) error {
 
-	t := table.New(w)
+	t := table.New(option.Output)
 
-	t.SetHeaders("Service", "Misconfigurations")
-	t.AddHeaders("Service", "Critical", "High", "Medium", "Low", "Unknown")
+	w, _, err := term.GetSize(0)
+	if err != nil {
+		w = 80
+	}
+	maxWidth := w - 60
+	if maxWidth < 20 {
+		maxWidth = 20
+	}
+
+	t.SetColumnMaxWidth(maxWidth)
+	t.SetHeaders("Resource", "Misconfigurations")
+	t.AddHeaders("Resource", "Critical", "High", "Medium", "Low", "Unknown")
 	t.SetAlignment(table.AlignLeft, table.AlignCenter, table.AlignCenter, table.AlignCenter, table.AlignCenter, table.AlignCenter)
 	t.SetAutoMergeHeaders(true)
 	t.SetHeaderColSpans(0, 1, 5)
 
-	// map service -> severity -> count
+	// map resource -> severity -> count
 	grouped := make(map[string]map[string]int)
 	for _, result := range report.Results {
 		for _, misconfiguration := range result.Misconfigurations {
-			if _, ok := grouped[misconfiguration.CauseMetadata.Service]; !ok {
-				grouped[misconfiguration.CauseMetadata.Service] = make(map[string]int)
+			if _, ok := grouped[misconfiguration.CauseMetadata.Resource]; !ok {
+				grouped[misconfiguration.CauseMetadata.Resource] = make(map[string]int)
 			}
-			grouped[misconfiguration.CauseMetadata.Service][misconfiguration.Severity]++
+			grouped[misconfiguration.CauseMetadata.Resource][misconfiguration.Severity]++
 		}
 	}
 
-	for service, severityCounts := range grouped {
+	for resource, severityCounts := range grouped {
 		t.AddRow(
-			service,
+			resource,
 			pkgReport.ColorizeSeverity(strconv.Itoa(severityCounts["CRITICAL"]), "CRITICAL"),
 			pkgReport.ColorizeSeverity(strconv.Itoa(severityCounts["HIGH"]), "HIGH"),
 			pkgReport.ColorizeSeverity(strconv.Itoa(severityCounts["MEDIUM"]), "MEDIUM"),
@@ -42,7 +53,7 @@ func writeSummaryTable(w io.Writer, report *Report, fromCache bool) error {
 	}
 
 	// render scan title
-	_, _ = fmt.Fprintf(w, "\n\x1b[1mScan Overview for AWS Account %s\x1b[0m\n", report.AccountID)
+	_, _ = fmt.Fprintf(option.Output, "\n\x1b[1mResource Summary for Service '%s' (AWS Account %s)\x1b[0m\n", option.Service, report.AccountID)
 
 	// render table
 	t.Render()
@@ -50,8 +61,8 @@ func writeSummaryTable(w io.Writer, report *Report, fromCache bool) error {
 	// TODO: render individual results if necessary
 
 	// render cache info
-	if fromCache {
-		_, _ = fmt.Fprintf(w, "\n\x1b[34mThis scan report was loaded from cached results. If you'd like to run a fresh scan, use --update-cache.\x1b[0m\n")
+	if option.FromCache {
+		_, _ = fmt.Fprintf(option.Output, "\n\x1b[34mThis scan report was loaded from cached results. If you'd like to run a fresh scan, use --update-cache.\x1b[0m\n")
 	}
 
 	return nil

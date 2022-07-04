@@ -10,6 +10,7 @@ type AWSOption struct {
 	Endpoint    string
 	Services    []string
 	UpdateCache bool
+	ARN         string
 }
 
 // NewAWSOption is the factory method to return AWS options
@@ -19,5 +20,6 @@ func NewAWSOption(c *cli.Context) AWSOption {
 		Endpoint:    c.String("endpoint"),
 		Services:    c.StringSlice("service"),
 		UpdateCache: c.Bool("update-cache"),
+		ARN:         c.String("arn"),
 	}
 }

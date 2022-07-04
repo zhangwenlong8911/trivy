@@ -22,12 +22,23 @@ const (
 )
 
 type Option struct {
-	Format     string
-	Type       string
-	Output     io.Writer
-	Severities []dbTypes.Severity
-	FromCache  bool
+	Format      string
+	Type        string
+	Output      io.Writer
+	Severities  []dbTypes.Severity
+	FromCache   bool
+	ReportLevel Level
+	Service     string
+	ARN         string
 }
+
+type Level uint8
+
+const (
+	LevelService Level = iota
+	LevelResource
+	LevelResult
+)
 
 // Report represents a kubernetes scan report
 type Report struct {
@@ -57,7 +68,17 @@ func Write(report *Report, option Option) error {
 	case jsonFormat:
 		return json.NewEncoder(option.Output).Encode(report)
 	case tableFormat:
-		return writeSummaryTable(option.Output, report, option.FromCache)
+		switch option.ReportLevel {
+		case LevelService:
+			return writeServiceTable(report, option)
+		case LevelResource:
+			return writeResourceTable(report, option)
+		case LevelResult:
+			return writeResultsForARN(report, option)
+		default:
+			panic("bad level: " + string(option.ReportLevel))
+		}
+
 	default:
 		return xerrors.Errorf(`unknown format %q. Use "json" or "table"`, option.Format)
 	}
