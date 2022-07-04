@@ -94,6 +94,7 @@ const (
 	ArtifactContainerImage   ArtifactType = "container_image"
 	ArtifactFilesystem       ArtifactType = "filesystem"
 	ArtifactRemoteRepository ArtifactType = "repository"
+	ArtifactAWSAccount       ArtifactType = "aws"
 )
 
 // ArtifactReference represents a reference of container image, local filesystem and repository

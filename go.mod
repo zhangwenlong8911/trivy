@@ -36,6 +36,7 @@ require (
 	github.com/knqyf263/go-deb-version v0.0.0-20190517075300-09fca494f03d
 	github.com/knqyf263/go-rpm-version v0.0.0-20170716094938-74609b86c936
 	github.com/kylelemons/godebug v1.1.0
+	github.com/liamg/loading v0.0.2
 	github.com/mailru/easyjson v0.7.6
 	github.com/masahiro331/go-mvn-version v0.0.0-20210429150710-d3157d602a08
 	github.com/mitchellh/hashstructure/v2 v2.0.2
@@ -44,7 +45,7 @@ require (
 	github.com/package-url/packageurl-go v0.1.1-0.20220203205134-d70459300c8a
 	github.com/samber/lo v1.21.0
 	github.com/sosedoff/gitkit v0.3.0
-	github.com/stretchr/testify v1.7.3
+	github.com/stretchr/testify v1.7.5
 	github.com/testcontainers/testcontainers-go v0.13.0
 	github.com/tetratelabs/wazero v0.0.0-20220606011721-119b069ba23e
 	github.com/twitchtv/twirp v8.1.2+incompatible
@@ -56,6 +57,26 @@ require (
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
+)
+
+require (
+	github.com/aws/aws-sdk-go-v2 v1.16.5 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.2 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.15.11 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.6 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.6 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.12 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.6 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.13 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.7 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.11 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.11.9 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.16.7 // indirect
+	github.com/aws/smithy-go v1.11.3 // indirect
 )
 
 require (
@@ -92,7 +113,7 @@ require (
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/aquasecurity/defsec v0.68.6
+	github.com/aquasecurity/defsec v0.68.7-0.20220704134126-9d6822c1b3b8
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
 	github.com/aws/aws-sdk-go v1.44.25
 	github.com/beorn7/perks v1.0.1 // indirect

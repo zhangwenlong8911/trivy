@@ -37,18 +37,29 @@ func NewArtifactOption(c *cli.Context) ArtifactOption {
 
 // Init initialize the CLI context for artifact scanning
 func (c *ArtifactOption) Init(ctx *cli.Context, logger *zap.SugaredLogger) (err error) {
-	if c.Input == "" && ctx.Args().Len() == 0 {
-		logger.Debug(`trivy requires at least 1 argument or --input option`)
-		_ = cli.ShowSubcommandHelp(ctx) // nolint: errcheck
-		os.Exit(0)
-	} else if ctx.Args().Len() > 1 && ctx.Command.Name != "kubernetes" {
-		logger.Error(`multiple targets cannot be specified`)
-		return xerrors.New("arguments error")
+
+	switch ctx.Command.Name {
+	case "aws":
+		if ctx.Args().Len() > 0 {
+			logger.Error(`targets should not be specified for the "aws" command`)
+			return xerrors.New("arguments error")
+		}
+		return nil
+	case "kubernetes":
+		if c.Input == "" && ctx.Args().Len() == 0 {
+			logger.Debug(`trivy kubernetes requires at least 1 argument or --input option`)
+			_ = cli.ShowSubcommandHelp(ctx) // nolint: errcheck
+			os.Exit(0)
+		}
+	default:
+		if ctx.Args().Len() != 1 {
+			logger.Error(`exactly one target must be specified`)
+			return xerrors.New("arguments error")
+		}
 	}
 
 	if c.Input == "" {
 		c.Target = ctx.Args().First()
 	}
-
 	return nil
 }

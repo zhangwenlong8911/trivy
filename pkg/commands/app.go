@@ -12,6 +12,7 @@ import (
 
 	"github.com/aquasecurity/trivy-db/pkg/metadata"
 	dbTypes "github.com/aquasecurity/trivy-db/pkg/types"
+	awscommands "github.com/aquasecurity/trivy/pkg/cloud/aws/commands"
 	"github.com/aquasecurity/trivy/pkg/commands/artifact"
 	"github.com/aquasecurity/trivy/pkg/commands/module"
 	"github.com/aquasecurity/trivy/pkg/commands/option"
@@ -377,6 +378,24 @@ var (
 		EnvVars: []string{"TRIVY_DEPENDENCY_TREE"},
 	}
 
+	awsRegionFlag = cli.StringFlag{
+		Name:    "region",
+		Usage:   "AWS Region",
+		EnvVars: []string{"TRIVY_AWS_REGION", "AWS_REGION", "AWS_DEFAULT_REGION"},
+	}
+
+	awsEndpointFlag = cli.StringFlag{
+		Name:    "endpoint",
+		Usage:   "AWS Endpoint",
+		EnvVars: []string{"TRIVY_AWS_ENDPOINT", "AWS_ENDPOINT"},
+	}
+
+	awsServiceFlag = cli.StringSliceFlag{
+		Name:    "service",
+		Usage:   "Only scan AWS Service(s) specified with this flag. Can specify multiple services using --service A --service B etc.",
+		EnvVars: []string{"TRIVY_AWS_SERVICE"},
+	}
+
 	// Global flags
 	globalFlags = []cli.Flag{
 		&quietFlag,
@@ -426,6 +445,7 @@ func NewApp(version string) *cli.App {
 		NewK8sCommand(),
 		NewSbomCommand(),
 		NewVersionCommand(),
+		NewAWSCommand(),
 	}
 	app.Commands = append(app.Commands, plugin.LoadCommands()...)
 
@@ -968,6 +988,40 @@ func NewSbomCommand() *cli.Command {
 				EnvVars: []string{"TRIVY_SBOM_FORMAT"},
 				Hidden:  true,
 			},
+		},
+	}
+}
+
+// NewAWSCommand is the factory method to add aws subcommand
+func NewAWSCommand() *cli.Command {
+	return &cli.Command{
+		Name:      "aws",
+		Usage:     "scan an aws account for misconfigurations",
+		UsageText: "trivy aws [command options]",
+		CustomHelpTemplate: cli.CommandHelpTemplate + `EXAMPLES:
+  - Scan an AWS account:
+      Trivy uses the same authentication methods as the AWS CLI. See https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
+      $ trivy aws
+`,
+		Action: awscommands.Run,
+		Flags: []cli.Flag{
+			&awsServiceFlag,
+			&awsEndpointFlag,
+			&awsRegionFlag,
+			&templateFlag,
+			&formatFlag,
+			&severityFlag,
+			&outputFlag,
+			&exitCodeFlag,
+			&resetFlag,
+			&clearCacheFlag,
+			&timeoutFlag,
+			&includeNonFailures,
+			&traceFlag,
+			// for rego misconfigurations
+			stringSliceFlag(configPolicy),
+			stringSliceFlag(configData),
+			stringSliceFlag(policyNamespaces),
 		},
 	}
 }

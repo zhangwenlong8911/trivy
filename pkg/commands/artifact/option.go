@@ -12,6 +12,7 @@ import (
 type Option struct {
 	option.GlobalOption
 	option.ArtifactOption
+	option.AWSOption
 	option.DBOption
 	option.ImageOption
 	option.ReportOption
@@ -38,6 +39,7 @@ func NewOption(c *cli.Context) (Option, error) {
 	return Option{
 		GlobalOption:     gc,
 		ArtifactOption:   option.NewArtifactOption(c),
+		AWSOption:        option.NewAWSOption(c),
 		DBOption:         option.NewDBOption(c),
 		ImageOption:      option.NewImageOption(c),
 		ReportOption:     option.NewReportOption(c),
