@@ -68,6 +68,25 @@ func run(ctx context.Context, opt cmd.Option) error {
 		}
 	}()
 
+	reportOptions := report.Option{
+		Format:      opt.Format,
+		Output:      opt.Output,
+		Severities:  opt.Severities,
+		ReportLevel: report.LevelService,
+	}
+	if len(opt.Services) == 1 {
+		reportOptions.ReportLevel = report.LevelResource
+		reportOptions.Service = opt.Services[0]
+	}
+	if opt.ARN != "" {
+		arnParts := strings.Split(opt.ARN, ":")
+		if len(arnParts) > 2 {
+			reportOptions.Service = arnParts[2]
+		}
+		reportOptions.ReportLevel = report.LevelResult
+		reportOptions.ARN = opt.ARN
+	}
+
 	accountID, err := getAccountID(ctx)
 	if err != nil {
 		return err
@@ -127,21 +146,6 @@ func run(ctx context.Context, opt cmd.Option) error {
 	}
 
 	var r *report.Report
-
-	reportOptions := report.Option{
-		Format:      opt.Format,
-		Output:      opt.Output,
-		Severities:  opt.Severities,
-		ReportLevel: report.LevelService,
-	}
-	if len(opt.Services) == 1 {
-		reportOptions.ReportLevel = report.LevelResource
-		reportOptions.Service = opt.Services[0]
-	}
-	if opt.ARN != "" {
-		reportOptions.ReportLevel = report.LevelResult
-		reportOptions.ARN = opt.ARN
-	}
 
 	// if there is anything we need that wasn't in the cache, scan it now
 	if len(remaining) > 0 {

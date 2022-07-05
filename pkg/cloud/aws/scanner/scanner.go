@@ -23,8 +23,8 @@ func (s *AWSScanner) Scan(ctx context.Context, option cmd.Option) (scan.Results,
 
 	var scannerOpts []options.ScannerOption
 	if !option.NoProgress {
-		tracker := newMultibar()
-		defer tracker.serviceBar.Finish()
+		tracker := newProgressTracker()
+		defer tracker.Finish()
 		scannerOpts = append(scannerOpts, scanner.ScannerWithProgressTracker(tracker))
 	}
 
