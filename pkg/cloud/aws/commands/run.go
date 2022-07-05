@@ -77,14 +77,12 @@ func run(ctx context.Context, opt cmd.Option) error {
 	if len(opt.Services) == 1 {
 		reportOptions.ReportLevel = report.LevelResource
 		reportOptions.Service = opt.Services[0]
-	}
-	if opt.ARN != "" {
-		arnParts := strings.Split(opt.ARN, ":")
-		if len(arnParts) > 2 {
-			reportOptions.Service = arnParts[2]
+		if opt.ARN != "" {
+			reportOptions.ReportLevel = report.LevelResult
+			reportOptions.ARN = opt.ARN
 		}
-		reportOptions.ReportLevel = report.LevelResult
-		reportOptions.ARN = opt.ARN
+	} else if opt.ARN != "" {
+		return fmt.Errorf("you must specify the single --service which the --arn relates to")
 	}
 
 	accountID, err := getAccountID(ctx)
