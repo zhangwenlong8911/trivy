@@ -14,6 +14,7 @@ func writeServiceTable(report *Report, option Option) error {
 
 	t.SetHeaders("Service", "Misconfigurations")
 	t.AddHeaders("Service", "Critical", "High", "Medium", "Low", "Unknown")
+	t.SetRowLines(false)
 	t.SetAlignment(table.AlignLeft, table.AlignCenter, table.AlignCenter, table.AlignCenter, table.AlignCenter, table.AlignCenter)
 	t.SetAutoMergeHeaders(true)
 	t.SetHeaderColSpans(0, 1, 5)

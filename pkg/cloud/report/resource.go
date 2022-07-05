@@ -27,6 +27,7 @@ func writeResourceTable(report *Report, option Option) error {
 	t.SetHeaders("Resource", "Misconfigurations")
 	t.AddHeaders("Resource", "Critical", "High", "Medium", "Low", "Unknown")
 	t.SetAlignment(table.AlignLeft, table.AlignCenter, table.AlignCenter, table.AlignCenter, table.AlignCenter, table.AlignCenter)
+	t.SetRowLines(false)
 	t.SetAutoMergeHeaders(true)
 	t.SetHeaderColSpans(0, 1, 5)
 
